@@ -14,7 +14,7 @@ class Client
 			response = @github.post_gist(File.basename(filename),File.open(filename).read);
 			puts 'the file '+File.basename(filename)+' has been uploaded to '+response['html_url']
 			if (share != nil)
-				Broach.speak('Testing', 'I just uploded a gist for everyone @ ' + response['html_url'])
+				Broach.speak(@config['campfire']['room'], 'I just uploded a gist for everyone @ ' + response['html_url'])
 				puts('...and shared')
 			end
 		else
