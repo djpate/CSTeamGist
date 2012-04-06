@@ -28,8 +28,25 @@ class Github
 		return request(ap)
 	end
 
+	def post_gist(filename, content)
+		
+		info = {
+			'public' => true,
+			'files' => {
+				filename => {
+					'content' => content
+				}
+			}
+		}
+
+		json = info.to_json
+
+		return request('/gists', json)
+
+	end
+
 	private
-	def request(url)
+	def request(url, post = nil)
 		
 		uri 			= URI.parse(@@base_url + url)
 		
@@ -37,19 +54,18 @@ class Github
 		http.use_ssl 	= true
 		http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-		request 		= Net::HTTP::Get.new(uri.request_uri)
+		if( post == nil)
+			request 		= Net::HTTP::Get.new(uri.request_uri)
+		else
+			request 		= Net::HTTP::Post.new(uri.request_uri,initheader = {'Content-Type' =>'application/json'})
+			request.body 	= post
+		end
+		
 		request.basic_auth(@username,@password)
 
 		return JSON.parse(http.request(request).body)
 	end
 
-end
 
-g = Github.new('djpate','....');
-gists = g.get_gists('djpate')
 
-gists.each do |gist|
-	g.get_gist(gist['id'])['files'].each  do |key, content|
-		p content['content']
-	end
 end
